@@ -8,13 +8,13 @@ Covers version 1.0.0 of the API. Full documentation, guides and the API referenc
 ## Install
 
 ```bash
-go get github.com/blacksignals/sigwise-go
+go get github.com/thesigwise/sigwise-go
 ```
 
 ## Quick start
 
 ```go
-import sigwise "github.com/blacksignals/sigwise-go"
+import sigwise "github.com/thesigwise/sigwise-go"
 
 // Empty values fall back to ANALYZE_API_KEY and ANALYZE_SECRET.
 client := sigwise.New("your_key_id", "your_secret")
