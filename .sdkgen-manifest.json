@@ -1,0 +1,13 @@
+{
+  "generator": "generate-sdk",
+  "language": "go",
+  "version": "1.0.0",
+  "files": [
+    "README.md",
+    "client.go",
+    "go.mod",
+    "models.go",
+    "services.go",
+    "webhooks.go"
+  ]
+}
