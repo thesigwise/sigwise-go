@@ -143,6 +143,13 @@ An object is anything you want answers about: a user, a listing, an order.
 - `client.Objects.Analyze(ctx context.Context, objectID string) (*AnalyzeScheduled, error)`  
   `POST /v1/objects/{object_id}/analyze`: Re-analyze an object
 
+### playground
+
+Events and messages are the evidence an object's answers are computed from.
+
+- `client.Playground.Run(ctx context.Context, body *PlaygroundRequest) (*PlaygroundResult, error)`  
+  `POST /v1/playground`: Try signals on sample events
+
 ### events
 
 Events and messages are the evidence an object's answers are computed from.

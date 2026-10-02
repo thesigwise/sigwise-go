@@ -263,6 +263,23 @@ type IngestRequest struct {
 	IncludeHistory *bool `json:"include_history,omitempty"`
 }
 
+// The totals of a bulk run, on the entry that stands for it with
+// `group=batch`.
+type LedgerBatch struct {
+	// How many charges the run has.
+	Count int `json:"count"`
+	// The run's total, in micro-dollars (negative).
+	DeltaMicros  int `json:"delta_micros"`
+	InputTokens  int `json:"input_tokens"`
+	OutputTokens int `json:"output_tokens"`
+	// How many distinct models the run was billed for.
+	Models int `json:"models"`
+	// One of the models; the only one when `models` is 1.
+	Model *string `json:"model,omitempty"`
+	// When the run's first charge was made.
+	FirstAt time.Time `json:"first_at"`
+}
+
 // LedgerEntry is part of the SigWise API.
 type LedgerEntry struct {
 	ID string `json:"id"`
@@ -281,8 +298,14 @@ type LedgerEntry struct {
 	InputTokens        *int     `json:"input_tokens,omitempty"`
 	OutputTokens       *int     `json:"output_tokens,omitempty"`
 	// The Stripe Checkout Session that paid for a top-up.
-	PaymentRef *string   `json:"payment_ref,omitempty"`
-	CreatedAt  time.Time `json:"created_at"`
+	PaymentRef *string `json:"payment_ref,omitempty"`
+	// Shared by the charges of one bulk run (re-analyzing all objects, or a signal
+	// backfill). Absent for a single object's analysis and for credits.
+	BatchID *string `json:"batch_id,omitempty"`
+	// The totals of a bulk run, on the entry that stands for it with
+	// `group=batch`.
+	Batch     *LedgerBatch `json:"batch,omitempty"`
+	CreatedAt time.Time    `json:"created_at"`
 }
 
 // LedgerPage is part of the SigWise API.
@@ -375,6 +398,31 @@ type Overview struct {
 	SignalSummary []SignalSummary `json:"signal_summary"`
 	Categories    []CategoryCount `json:"categories"`
 	TopRisk       []RiskyObject   `json:"top_risk"`
+}
+
+// PlaygroundRequest is part of the SigWise API.
+type PlaygroundRequest struct {
+	// Optional classification, e.g. `user` or `listing`.
+	ObjectType *string      `json:"object_type,omitempty"`
+	Events     []EventInput `json:"events"`
+	// Score only these signal keys. Omit to score every enabled signal.
+	Signals []string `json:"signals,omitempty"`
+}
+
+// PlaygroundResult is part of the SigWise API.
+type PlaygroundResult struct {
+	// False when no enabled signal matched, so nothing was scored.
+	Analyzed bool `json:"analyzed"`
+	// The model that produced the answers, e.g. `model-1`.
+	Model     string   `json:"model"`
+	LatencyMs int      `json:"latency_ms"`
+	Answers   []Answer `json:"answers"`
+	// What the run was charged, in millionths of a US dollar.
+	CostMicros int `json:"cost_micros"`
+	// How many events were scored.
+	EventsCount int `json:"events_count"`
+	// Why nothing was analyzed, when `analyzed` is false.
+	Reason *string `json:"reason,omitempty"`
 }
 
 // One of the objects with the highest yes/no probabilities.
