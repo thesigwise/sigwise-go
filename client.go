@@ -34,7 +34,7 @@ import (
 
 const (
 	// Version is the SDK's version.
-	Version = "1.0.1"
+	Version = "1.0.2"
 	// DefaultBaseURL is the API the client talks to unless told otherwise.
 	DefaultBaseURL = "https://api.sigwise.ai"
 
@@ -59,6 +59,8 @@ type Client struct {
 	Overview *OverviewService
 	// An object is anything you want answers about: a user, a listing, an order.
 	Objects *ObjectsService
+	// Events and messages are the evidence an object's answers are computed from.
+	Playground *PlaygroundService
 	// Events and messages are the evidence an object's answers are computed from.
 	Events *EventsService
 	// A signal is a question you ask about every object, such as "is this a scammer?" (`noul`), "how trustworthy is this user?" (`score`) or "what is their buyer intent?" (`choice`).
@@ -126,6 +128,7 @@ func New(apiKey, secret string, opts ...Option) *Client {
 	c.Me = &MeService{c: c}
 	c.Overview = &OverviewService{c: c}
 	c.Objects = &ObjectsService{c: c}
+	c.Playground = &PlaygroundService{c: c}
 	c.Events = &EventsService{c: c}
 	c.Signals = &SignalsService{c: c}
 	c.Settings = &SettingsService{c: c}

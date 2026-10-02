@@ -118,9 +118,14 @@ func (p *ListRuleFiringsParams) values() url.Values {
 // ListLedgerParams are the query parameters of BillingService.ListLedger.
 type ListLedgerParams struct {
 	// Only credits (funds added) or only charges (analyses).
-	Type   *string
-	Limit  *int
-	Cursor *string
+	Type  *string
+	Limit *int
+	// `batch` lists each bulk run once, as its newest charge with the run's totals
+	// in `batch`.
+	Group *string
+	// Only the charges of this bulk run.
+	BatchID *string
+	Cursor  *string
 }
 
 func (p *ListLedgerParams) values() url.Values {
@@ -133,6 +138,12 @@ func (p *ListLedgerParams) values() url.Values {
 	}
 	if p.Limit != nil {
 		q.Set("limit", fmt.Sprint(*p.Limit))
+	}
+	if p.Group != nil {
+		q.Set("group", *p.Group)
+	}
+	if p.BatchID != nil {
+		q.Set("batch_id", *p.BatchID)
 	}
 	if p.Cursor != nil {
 		q.Set("cursor", *p.Cursor)
@@ -278,6 +289,40 @@ func (s *ObjectsService) GetState(ctx context.Context, objectID string) (*Object
 func (s *ObjectsService) Analyze(ctx context.Context, objectID string) (*AnalyzeScheduled, error) {
 	var out AnalyzeScheduled
 	if err := s.c.do(ctx, "POST", "/v1/objects/{object_id}/analyze", map[string]string{"object_id": objectID}, nil, nil, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// PlaygroundService groups the playground operations. Events and messages are
+// the evidence an object's answers are computed from.
+type PlaygroundService struct{ c *Client }
+
+// Run — try signals on sample events.
+//
+// Scores sample events against your enabled signals and returns the answers,
+// **without recording anything**: no object is created, the events and answers
+// are not stored, and no rule or webhook fires. Use it to check how your
+// signals judge content before you send real traffic, or after you change a
+// signal's instructions.
+//
+// The events are scored on their own, with no history. Restrict the run to
+// some signals with `signals`. At most 50 events per run.
+//
+// The analysis is real, so it is charged to your balance like any other and
+// counted as a synchronous analysis in your usage. Returns `402` when the
+// balance is empty, `429` when the account already has the maximum number of
+// synchronous analyses in flight, and `503` with `analyzer_busy` when the
+// analyzer is throttling.
+//
+// POST /v1/playground
+func (s *PlaygroundService) Run(ctx context.Context, body *PlaygroundRequest) (*PlaygroundResult, error) {
+	var payload any
+	if body != nil {
+		payload = body
+	}
+	var out PlaygroundResult
+	if err := s.c.do(ctx, "POST", "/v1/playground", nil, nil, payload, &out); err != nil {
 		return nil, err
 	}
 	return &out, nil
