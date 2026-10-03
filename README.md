@@ -5,6 +5,24 @@ Send events about your objects, get typed answers back.
 Covers version 1.0.0 of the API. Full documentation, guides and the API reference:
 <https://sigwise.ai/docs>.
 
+## Get your API key and secret
+
+1. Sign up at <https://sigwise.ai/register> (or sign in).
+2. In the console, open **API keys** and click **New key**.
+3. Copy both values it shows:
+   - the **key ID** (for example `7Hx2Qp9LmZ`), which identifies the key;
+   - the **signing secret**, which is **shown only once**. Store it like a password.
+
+Pass them to the client, or set them in the environment, where the client
+finds them on its own:
+
+```bash
+export SIGWISE_API_KEY=your_key_id
+export SIGWISE_SECRET=your_secret
+```
+
+Lost the secret? **Rotate** the key on the same page to get a new one.
+
 ## Install
 
 ```bash
@@ -53,22 +71,22 @@ if v := res.ModerationVerdict; v != nil && len(v.Answers) > 0 && v.Answers[0].No
 
 ## Authentication
 
-Create an API key in the console. It is a pair: a public key ID and a
-signing secret (`your_secret`, shown once). The client sends the key ID with every
-request and signs a short-lived HS256 token with the secret, bound to the
-request's method and path. The secret itself is never sent, so keep it on your
-server. Without explicit options the client reads `SIGWISE_API_KEY`,
-`SIGWISE_SECRET` and `SIGWISE_BASE_URL` from the environment.
+The client sends the key ID with every request and signs a short-lived HS256
+token with the secret, bound to the request's method and path. The secret
+itself is never sent, so keep it on your server. Without explicit arguments
+the client reads `SIGWISE_API_KEY` and `SIGWISE_SECRET` from the environment.
 
 ## Configuration
 
 ```go
 client := sigwise.New("your_key_id", "your_secret",
-	sigwise.WithBaseURL("http://localhost:8080"),              // default: SIGWISE_BASE_URL or the production API
 	sigwise.WithHTTPClient(&http.Client{Timeout: 10 * time.Second}),
-	sigwise.WithMaxRetries(3),                                 // idempotent requests only
+	sigwise.WithMaxRetries(3), // idempotent requests only
 )
 ```
+
+The client talks to the production API (`https://api.sigwise.ai`). Optionally, point it at
+another deployment with `sigwise.WithBaseURL(...)` or the `SIGWISE_BASE_URL` environment variable.
 
 Idempotent requests (`GET`, `PUT`, `DELETE`) are retried with exponential
 backoff after a network error, a `429` or a `5xx`. Other requests are never
