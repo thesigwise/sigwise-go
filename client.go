@@ -34,7 +34,7 @@ import (
 
 const (
 	// Version is the SDK's version.
-	Version = "1.0.2"
+	Version = "1.0.3"
 	// DefaultBaseURL is the API the client talks to unless told otherwise.
 	DefaultBaseURL = "https://api.sigwise.ai"
 
@@ -100,16 +100,16 @@ func WithMaxRetries(n int) Option { return func(c *Client) { c.maxRetries = n } 
 func WithHeader(key, value string) Option { return func(c *Client) { c.header.Add(key, value) } }
 
 // New returns a client for the API key and its signing secret.
-// Empty values fall back to the ANALYZE_API_KEY and ANALYZE_SECRET environment
-// variables, and the base URL to ANALYZE_BASE_URL.
+// Empty values fall back to the SIGWISE_API_KEY and SIGWISE_SECRET environment
+// variables, and the base URL to SIGWISE_BASE_URL.
 func New(apiKey, secret string, opts ...Option) *Client {
 	if apiKey == "" {
-		apiKey = os.Getenv("ANALYZE_API_KEY")
+		apiKey = os.Getenv("SIGWISE_API_KEY")
 	}
 	if secret == "" {
-		secret = os.Getenv("ANALYZE_SECRET")
+		secret = os.Getenv("SIGWISE_SECRET")
 	}
-	base := os.Getenv("ANALYZE_BASE_URL")
+	base := os.Getenv("SIGWISE_BASE_URL")
 	if base == "" {
 		base = DefaultBaseURL
 	}
@@ -236,7 +236,7 @@ func (c *Client) do(ctx context.Context, method, path string, pathParams map[str
 // doRaw sends a request and returns the status and body of a 2xx response.
 func (c *Client) doRaw(ctx context.Context, method, path string, pathParams map[string]string, query url.Values, body any) (int, []byte, error) {
 	if c.apiKey == "" || c.secret == "" {
-		return 0, nil, errors.New("sigwise: an API key and its secret are required (pass them to New or set ANALYZE_API_KEY and ANALYZE_SECRET)")
+		return 0, nil, errors.New("sigwise: an API key and its secret are required (pass them to New or set SIGWISE_API_KEY and SIGWISE_SECRET)")
 	}
 	rawPath, encodedPath := path, path
 	for name, value := range pathParams {

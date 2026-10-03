@@ -1,7 +1,7 @@
 {
   "generator": "generate-sdk",
   "language": "go",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "files": [
     "README.md",
     "client.go",
