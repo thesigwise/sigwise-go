@@ -16,7 +16,7 @@ go get github.com/thesigwise/sigwise-go
 ```go
 import sigwise "github.com/thesigwise/sigwise-go"
 
-// Empty values fall back to ANALYZE_API_KEY and ANALYZE_SECRET.
+// Empty values fall back to SIGWISE_API_KEY and SIGWISE_SECRET.
 client := sigwise.New("your_key_id", "your_secret")
 
 // Configure what you want to know about your objects.
@@ -57,14 +57,14 @@ Create an API key in the console. It is a pair: a public key ID and a
 signing secret (`your_secret`, shown once). The client sends the key ID with every
 request and signs a short-lived HS256 token with the secret, bound to the
 request's method and path. The secret itself is never sent, so keep it on your
-server. Without explicit options the client reads `ANALYZE_API_KEY`,
-`ANALYZE_SECRET` and `ANALYZE_BASE_URL` from the environment.
+server. Without explicit options the client reads `SIGWISE_API_KEY`,
+`SIGWISE_SECRET` and `SIGWISE_BASE_URL` from the environment.
 
 ## Configuration
 
 ```go
 client := sigwise.New("your_key_id", "your_secret",
-	sigwise.WithBaseURL("http://localhost:8080"),              // default: ANALYZE_BASE_URL or the production API
+	sigwise.WithBaseURL("http://localhost:8080"),              // default: SIGWISE_BASE_URL or the production API
 	sigwise.WithHTTPClient(&http.Client{Timeout: 10 * time.Second}),
 	sigwise.WithMaxRetries(3),                                 // idempotent requests only
 )
@@ -101,7 +101,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body) // the raw body, exactly as received
 	ev, err := sigwise.ParseWebhookEvent(body,
 		r.Header.Get("X-Webhook-Signature"), r.Header.Get("X-Webhook-Timestamp"),
-		os.Getenv("ANALYZE_WEBHOOK_SECRET"), 0)
+		os.Getenv("SIGWISE_WEBHOOK_SECRET"), 0)
 	if err != nil {
 		http.Error(w, "invalid signature", http.StatusBadRequest)
 		return
