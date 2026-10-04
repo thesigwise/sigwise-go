@@ -34,7 +34,7 @@ import (
 
 const (
 	// Version is the SDK's version.
-	Version = "1.0.4"
+	Version = "1.0.5"
 	// DefaultBaseURL is the API the client talks to unless told otherwise.
 	DefaultBaseURL = "https://api.sigwise.ai"
 

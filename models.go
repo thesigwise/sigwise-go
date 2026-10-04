@@ -228,6 +228,23 @@ type EventList struct {
 	Events []Event `json:"events"`
 }
 
+// How long the raw events you send are kept. Answers are kept in every mode.
+//
+// - `forever` (default): until you delete the object.
+// - `days`: deleted `event_retention_days` after they were received.
+// - `after_analysis`: deleted as soon as an analysis has read them; their
+// counts stay in the object's summary. Events sent with `wait: true` are never
+// written. Events that cannot be analyzed are deleted after 24 hours
+// regardless.
+type EventRetention string
+
+// Values of EventRetention.
+const (
+	EventRetentionForever       EventRetention = "forever"
+	EventRetentionDays          EventRetention = "days"
+	EventRetentionAfterAnalysis EventRetention = "after_analysis"
+)
+
 // `event` is a discrete action (e.g. `profile.updated`); `message` is
 // free-form text.
 type EventType string
@@ -523,11 +540,20 @@ type Settings struct {
 	// Creating a signal automatically backfills existing objects for it. Off by
 	// default because each analysis is billed.
 	AutoBackfillSignals bool `json:"auto_backfill_signals"`
+	// How long the raw events you send are kept.
+	EventRetention EventRetention `json:"event_retention"`
+	// With `event_retention` `days`, how many days events are kept. `null`
+	// otherwise.
+	EventRetentionDays *int `json:"event_retention_days"`
 }
 
 // SettingsUpdate is part of the SigWise API.
 type SettingsUpdate struct {
 	AutoBackfillSignals *bool `json:"auto_backfill_signals,omitempty"`
+	// How long the raw events you send are kept.
+	EventRetention *EventRetention `json:"event_retention,omitempty"`
+	// Required with `event_retention` `days`; not allowed with other values.
+	EventRetentionDays *int `json:"event_retention_days,omitempty"`
 }
 
 // Signal is part of the SigWise API.
