@@ -355,7 +355,7 @@ type ModerationVerdict struct {
 	// False when no configured signal matched, so nothing was scored.
 	Analyzed        bool `json:"analyzed"`
 	HistoryIncluded bool `json:"history_included"`
-	// The model that produced the answers, e.g. `model-1`.
+	// The model that produced the answers, e.g. `jev-1.13.0`.
 	Model     string   `json:"model"`
 	LatencyMs int      `json:"latency_ms"`
 	Answers   []Answer `json:"answers"`
@@ -430,7 +430,7 @@ type PlaygroundRequest struct {
 type PlaygroundResult struct {
 	// False when no enabled signal matched, so nothing was scored.
 	Analyzed bool `json:"analyzed"`
-	// The model that produced the answers, e.g. `model-1`.
+	// The model that produced the answers, e.g. `jev-1.13.0`.
 	Model     string   `json:"model"`
 	LatencyMs int      `json:"latency_ms"`
 	Answers   []Answer `json:"answers"`
